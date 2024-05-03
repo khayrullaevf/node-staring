@@ -1,6 +1,7 @@
 
 const fs=require('fs')
 const http=require('http')
+const url=require('url')
 
 
 
@@ -16,16 +17,42 @@ const http=require('http')
 
 let html=fs.readFileSync('./templates/index.html','utf-8')
 
+let products=JSON.parse(fs.readFileSync('./data/products.json','utf-8'))
+let productListHtml=fs.readFileSync('./templates/product-list.html','utf-8')
+let productDetailsHtml=fs.readFileSync('./templates/product-list.html','utf-8')
+
+
+
+function replaceHtml(template ,product) {
+    let output = template.replace('{{%IMAGE%}}', product.prodImage);
+    output = output.replace('{{%NAME%}}', product.name);
+    output = output.replace('{{%MODELNAME%}}', product.modeName);
+    output = output.replace('{{%MODELNO%}}', product.modelNumber);
+    output = output.replace('{{%SIZE%}}', product.size);
+    output = output.replace('{{%CAMERA%}}', product.camera);
+    output = output.replace('{{%PRICE%}}', product.price);
+    output = output.replace('{{%COLOR%}}', product.color);
+    output = output.replace('{{%ID%}}', product.id);
+    output = output.replace('{{%ROM%}}', product.ROM);
+    output = output.replace('{{%DESC%}}', product.Description);
+    return output
+}
+
+
+
+
 //Lecture 8. CREATE SERVER
 
 //1.CREATE SERVER
 const server=http.createServer((request,response)=>{
     console.log('A new request has been recieved');
-    
-    let path=request.url
-  
+
+
+    let {pathname:path,query}=url.parse(request.url,true)
+
+
     if (path==='/'||path.toLowerCase()==='/home'){
-     response.writeHead(200,{
+        response.writeHead(200,{
         "Content-Type":"text/html",
         "my-header":'Fazliddins header'
      })
@@ -42,11 +69,38 @@ const server=http.createServer((request,response)=>{
             "Content-Type":"text/html",
             "my-header":'Fazliddins header'
          })
+
+
         response.end(html.replace('{{%CONTENT%}}','You are in contact page'))
+    } else if(path.toLowerCase()==='/products'){
+        response.writeHead(200,{  "Content-Type":"text/html"})
+
+        if (!query.id) {
+          let productHtmlArray=products.map((prod)=>{
+               return replaceHtml(productListHtml,prod)
+            })
+            let productResponseHtml= html.replace('{{%CONTENT%}}',productHtmlArray.join(','))
+            response.end(productResponseHtml)
+        }else{
+             let prod=products[query.id]
+              console.log(prod);
+
+             let productDetailResponseHtml=replaceHtml(productDetailsHtml,prod)
+             console.log(productDetailResponseHtml);
+             response.end(html.replace('{{%CONTENT%}}',productDetailResponseHtml))
+
+        }
+
+
+
+
+
+
+
+         
     }else{
      response.writeHead(404,{
         "Content-Type":"text/html",
-        "my-header":'Fazliddins header'
      })
         response.end(html.replace('{{%CONTENT%}}','PAGE NOT FOUND !'))
     }
