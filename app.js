@@ -69,12 +69,9 @@ const server=http.createServer((request,response)=>{
             "Content-Type":"text/html",
             "my-header":'Fazliddins header'
          })
-
-
         response.end(html.replace('{{%CONTENT%}}','You are in contact page'))
     } else if(path.toLowerCase()==='/products'){
         response.writeHead(200,{  "Content-Type":"text/html"})
-
         if (!query.id) {
           let productHtmlArray=products.map((prod)=>{
                return replaceHtml(productListHtml,prod)
@@ -83,21 +80,12 @@ const server=http.createServer((request,response)=>{
             response.end(productResponseHtml)
         }else{
              let prod=products[query.id]
-              console.log(prod);
-
+             console.log(prod);
              let productDetailResponseHtml=replaceHtml(productDetailsHtml,prod)
              console.log(productDetailResponseHtml);
              response.end(html.replace('{{%CONTENT%}}',productDetailResponseHtml))
 
         }
-
-
-
-
-
-
-
-         
     }else{
      response.writeHead(404,{
         "Content-Type":"text/html",
