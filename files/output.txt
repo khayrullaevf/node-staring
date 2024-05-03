@@ -1,0 +1,2 @@
+Data read from input.xt : This is input file.
+Date created Fri May 03 2024 09:09:22 GMT+0300 (Moscow Standard Time)
