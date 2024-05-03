@@ -25,13 +25,29 @@ const server=http.createServer((request,response)=>{
     let path=request.url
   
     if (path==='/'||path.toLowerCase()==='/home'){
+     response.writeHead(200,{
+        "Content-Type":"text/html",
+        "my-header":'Fazliddins header'
+     })
       response.end(html.replace('{{%CONTENT%}}','You are in home page'))
     }else if (path.toLowerCase()==='/about') {
+        response.writeHead(200,{
+            "Content-Type":"text/html",
+            "my-header":'Fazliddins header'
+         })
         response.end(html.replace('{{%CONTENT%}}','You are in about page'))
 
     }else if(path.toLowerCase()==='/contact'){
+        response.writeHead(200,{
+            "Content-Type":"text/html",
+            "my-header":'Fazliddins header'
+         })
         response.end(html.replace('{{%CONTENT%}}','You are in contact page'))
     }else{
+     response.writeHead(404,{
+        "Content-Type":"text/html",
+        "my-header":'Fazliddins header'
+     })
         response.end(html.replace('{{%CONTENT%}}','PAGE NOT FOUND !'))
     }
 })
