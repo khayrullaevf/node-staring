@@ -2,6 +2,10 @@
 const fs=require('fs')
 const http=require('http')
 const url=require('url')
+const replaceHtml=require('./modules/replaceHtml')
+const events=require('events')
+
+const user=require('./modules/user')
 
 
 
@@ -23,20 +27,20 @@ let productDetailsHtml=fs.readFileSync('./templates/product-list.html','utf-8')
 
 
 
-function replaceHtml(template ,product) {
-    let output = template.replace('{{%IMAGE%}}', product.prodImage);
-    output = output.replace('{{%NAME%}}', product.name);
-    output = output.replace('{{%MODELNAME%}}', product.modeName);
-    output = output.replace('{{%MODELNO%}}', product.modelNumber);
-    output = output.replace('{{%SIZE%}}', product.size);
-    output = output.replace('{{%CAMERA%}}', product.camera);
-    output = output.replace('{{%PRICE%}}', product.price);
-    output = output.replace('{{%COLOR%}}', product.color);
-    output = output.replace('{{%ID%}}', product.id);
-    output = output.replace('{{%ROM%}}', product.ROM);
-    output = output.replace('{{%DESC%}}', product.Description);
-    return output
-}
+// function replaceHtml(template ,product) {
+//     let output = template.replace('{{%IMAGE%}}', product.prodImage);
+//     output = output.replace('{{%NAME%}}', product.name);
+//     output = output.replace('{{%MODELNAME%}}', product.modeName);
+//     output = output.replace('{{%MODELNO%}}', product.modelNumber);
+//     output = output.replace('{{%SIZE%}}', product.size);
+//     output = output.replace('{{%CAMERA%}}', product.camera);
+//     output = output.replace('{{%PRICE%}}', product.price);
+//     output = output.replace('{{%COLOR%}}', product.color);
+//     output = output.replace('{{%ID%}}', product.id);
+//     output = output.replace('{{%ROM%}}', product.ROM);
+//     output = output.replace('{{%DESC%}}', product.Description);
+//     return output
+// }
 
 
 
@@ -44,9 +48,62 @@ function replaceHtml(template ,product) {
 //Lecture 8. CREATE SERVER
 
 //1.CREATE SERVER
-const server=http.createServer((request,response)=>{
-    console.log('A new request has been recieved');
+// const server=http.createServer((request,response)=>{
+//     console.log('A new request has been recieved');
 
+
+//     let {pathname:path,query}=url.parse(request.url,true)
+
+
+//     if (path==='/'||path.toLowerCase()==='/home'){
+//         response.writeHead(200,{
+//         "Content-Type":"text/html",
+//         "my-header":'Fazliddins header'
+//      })
+//       response.end(html.replace('{{%CONTENT%}}','You are in home page'))
+//     }else if (path.toLowerCase()==='/about') {
+//         response.writeHead(200,{
+//             "Content-Type":"text/html",
+//             "my-header":'Fazliddins header'
+//          })
+//         response.end(html.replace('{{%CONTENT%}}','You are in about page'))
+
+//     }else if(path.toLowerCase()==='/contact'){
+//         response.writeHead(200,{
+//             "Content-Type":"text/html",
+//             "my-header":'Fazliddins header'
+//          })
+//         response.end(html.replace('{{%CONTENT%}}','You are in contact page'))
+//     } else if(path.toLowerCase()==='/products'){
+//         response.writeHead(200,{  "Content-Type":"text/html"})
+//         if (!query.id) {
+//           let productHtmlArray=products.map((prod)=>{
+//                return replaceHtml(productListHtml,prod)
+//             })
+//             let productResponseHtml= html.replace('{{%CONTENT%}}',productHtmlArray.join(','))
+//             response.end(productResponseHtml)
+//         }else{
+//              let prod=products[query.id]
+//              console.log(prod);
+//              let productDetailResponseHtml=replaceHtml(productDetailsHtml,prod)
+//              console.log(productDetailResponseHtml);
+//              response.end(html.replace('{{%CONTENT%}}',productDetailResponseHtml))
+
+//         }
+//     }else{
+//      response.writeHead(404,{
+//         "Content-Type":"text/html",
+//      })
+//         response.end(html.replace('{{%CONTENT%}}','PAGE NOT FOUND !'))
+//     }
+// })
+
+
+
+const server=http.createServer();
+
+server.on('request',(request,response)=>{
+    
 
     let {pathname:path,query}=url.parse(request.url,true)
 
@@ -80,7 +137,6 @@ const server=http.createServer((request,response)=>{
             response.end(productResponseHtml)
         }else{
              let prod=products[query.id]
-             console.log(prod);
              let productDetailResponseHtml=replaceHtml(productDetailsHtml,prod)
              console.log(productDetailResponseHtml);
              response.end(html.replace('{{%CONTENT%}}',productDetailResponseHtml))
@@ -92,14 +148,11 @@ const server=http.createServer((request,response)=>{
      })
         response.end(html.replace('{{%CONTENT%}}','PAGE NOT FOUND !'))
     }
+
 })
 
 
-
-
-
 //2.START SERVER
-
 server.listen(8000,'127.0.0.1',()=>{
     console.log('Server has started');
 })
@@ -162,3 +215,15 @@ server.listen(8000,'127.0.0.1',()=>{
 //     console.log('EInterface closed');
 //     process.exit(0)
 // })
+
+
+let myEmitter=new user()
+
+myEmitter.on('userCreated',(id,name)=>{
+    console.log(`A new user ${name} with id ${id} created`);
+})
+myEmitter.on('userCreated',(id,name)=>{
+    console.log(`A new user ${name} with id ${id} added to DB`);
+})
+myEmitter.emit('userCreated',101,'John')
+myEmitter.emit('userCreated',102,'Johny')
